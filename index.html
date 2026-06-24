@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SolvIQ — Real-Time Problem Solver</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css" />
+<style>
+  :root {
+    --bg: #0d0e12;
+    --bg2: #13151c;
+    --bg3: #1a1d27;
+    --bg4: #21253a;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text1: #f0f0f6;
+    --text2: #9799a8;
+    --text3: #5a5d70;
+    --accent: #7c6ef7;
+    --accent2: #9e93f8;
+    --accent-glow: rgba(124,110,247,0.18);
+    --teal: #2dd4bf;
+    --teal-dim: rgba(45,212,191,0.12);
+    --green: #4ade80;
+    --green-dim: rgba(74,222,128,0.12);
+    --amber: #fbbf24;
+    --amber-dim: rgba(251,191,36,0.12);
+    --red: #f87171;
+    --red-dim: rgba(248,113,113,0.12);
+    --pink: #f472b6;
+    --pink-dim: rgba(244,114,182,0.12);
+    --radius: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --font: 'Inter', sans-serif;
+    --font-display: 'DM Serif Display', serif;
+    --sidebar-w: 240px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text1);
+    font-size: 14px;
+    line-height: 1.6;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, #7c6ef7, #9e93f8);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 17px;
+  }
+  .logo-text { font-family: var(--font-display); font-size: 19px; color: var(--text1); letter-spacing: -0.3px; }
+  .logo-text em { font-style: italic; color: var(--accent2); }
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2); font-size: 17px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s;
+  }
+  .icon-btn:hover { background: var(--bg3); color: var(--text1); border-color: var(--border2); }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+  .sidebar-section { padding: 16px 12px 8px; }
+  .sidebar-label {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text3); padding: 0 6px; margin-bottom: 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px;
+    cursor: pointer; color: var(--text2);
+    font-size: 13px; font-weight: 400;
+    transition: all .12s; border: 1px solid transparent;
+    background: none; width: 100%; text-align: left;
+  }
+  .nav-item:hover { color: var(--text1); background: var(--bg3); }
+  .nav-item.active { color: var(--accent2); background: var(--accent-glow); border-color: rgba(124,110,247,0.2); font-weight: 500; }
+  .nav-item i { font-size: 16px; flex-shrink: 0; }
+  .nav-badge {
+    margin-left: auto; font-size: 10px; font-weight: 600;
+    padding: 1px 6px; border-radius: 20px;
+    background: var(--accent-glow); color: var(--accent2);
+  }
+  .sidebar-divider { height: 1px; background: var(--border); margin: 8px 16px; }
+
+  /* Profile card in sidebar */
+  .profile-area {
+    padding: 12px;
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+  }
+  .profile-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px; border-radius: var(--radius);
+    background: var(--bg3); cursor: pointer;
+    transition: background .12s;
+  }
+  .profile-card:hover { background: var(--bg4); }
+  .avatar-circle {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #7c6ef7, #2dd4bf);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0;
+  }
+  .profile-info { flex: 1; min-width: 0; }
+  .profile-name { font-size: 13px; font-weight: 500; color: var(--text1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .profile-role { font-size: 11px; color: var(--text3); }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── PANELS ── */
+  .panel { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+  .panel.active { display: flex; }
+
+  /* ── CHAT PANEL ── */
+  .chat-header {
+    padding: 16px 24px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .chat-header-left { display: flex; flex-direction: column; gap: 2px; }
+  .chat-title { font-size: 15px; font-weight: 500; color: var(--text1); }
+  .chat-subtitle { font-size: 12px; color: var(--text3); }
+  .chat-header-right { display: flex; gap: 6px; }
+
+  .category-bar {
+    display: flex; gap: 6px; padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto; flex-shrink: 0;
+  }
+  .category-bar::-webkit-scrollbar { display: none; }
+  .cat-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 20px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text2); font-size: 12px; font-weight: 500;
+    cursor: pointer; white-space: nowrap; transition: all .12s;
+    font-family: var(--font);
+  }
+  .cat-pill:hover { border-color: var(--border2); color: var(--text1); }
+  .cat-pill.active { background: var(--accent-glow); border-color: rgba(124,110,247,0.4); color: var(--accent2); }
+  .cat-pill i { font-size: 14px; }
+
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 20px 24px;
+    display: flex; flex-direction: column; gap: 16px;
+    scroll-behavior: smooth;
+  }
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+
+  .msg { display: flex; gap: 10px; animation: msgIn .2s ease; }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .msg.user { flex-direction: row-reverse; }
+  .msg-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; flex-shrink: 0; margin-top: 2px;
+  }
+  .msg.ai .msg-avatar { background: var(--accent-glow); color: var(--accent2); border: 1px solid rgba(124,110,247,0.2); }
+  .msg.user .msg-avatar { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+  .msg-content { max-width: 72%; display: flex; flex-direction: column; gap: 4px; }
+  .msg.user .msg-content { align-items: flex-end; }
+  .msg-meta { font-size: 10px; color: var(--text3); padding: 0 4px; }
+  .msg-bubble {
+    padding: 10px 14px; border-radius: 16px;
+    font-size: 13.5px; line-height: 1.65;
+  }
+  .msg.ai .msg-bubble {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-top-left-radius: 4px;
+    color: var(--text1);
+  }
+  .msg.user .msg-bubble {
+    background: linear-gradient(135deg, #7c6ef7, #6b5cf5);
+    color: #fff;
+    border-top-right-radius: 4px;
+  }
+  .typing-dots { display: flex; gap: 4px; align-items: center; padding: 2px 0; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); animation: dotBounce .9s infinite; }
+  .dot:nth-child(2) { animation-delay: .15s; }
+  .dot:nth-child(3) { animation-delay: .3s; }
+  @keyframes dotBounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+  .chat-input-area {
+    padding: 12px 20px 16px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .input-box {
+    display: flex; gap: 8px; align-items: flex-end;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 10px 10px 10px 14px;
+    transition: border-color .15s;
+  }
+  .input-box:focus-within { border-color: rgba(124,110,247,0.5); }
+  .input-box textarea {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--text1); font-family: var(--font); font-size: 14px;
+    resize: none; min-height: 22px; max-height: 120px;
+    line-height: 1.5;
+  }
+  .input-box textarea::placeholder { color: var(--text3); }
+  .input-actions { display: flex; gap: 6px; align-items: center; }
+  .voice-btn {
+    width: 34px; height: 34px; border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent; color: var(--text2);
+    font-size: 16px; cursor: pointer; transition: all .15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .voice-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .voice-btn.recording { background: var(--teal-dim); border-color: var(--teal); color: var(--teal); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(45,212,191,0.4); } 50% { box-shadow: 0 0 0 6px rgba(45,212,191,0); } }
+  .send-btn {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: linear-gradient(135deg, #7c6ef7, #6b5cf5);
+    border: none; color: #fff; font-size: 16px;
+    cursor: pointer; transition: all .15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .send-btn:hover { transform: scale(1.05); }
+  .send-btn:disabled { background: var(--bg4); color: var(--text3); cursor: not-allowed; transform: none; }
+  .input-hint { font-size: 11px; color: var(--text3); margin-top: 8px; text-align: center; }
+
+  /* ── AGENT DASHBOARD ── */
+  .dash-scroll { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .dash-scroll::-webkit-scrollbar { width: 4px; }
+  .dash-scroll::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+  .section-title { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .metrics-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+  .metric-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px 16px;
+  }
+  .metric-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+  .metric-val { font-size: 22px; font-weight: 600; color: var(--text1); }
+  .metric-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .metric-up { color: var(--green); font-size: 11px; margin-top: 2px; }
+
+  .agents-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .agent-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 16px;
+    transition: border-color .15s;
+  }
+  .agent-card:hover { border-color: var(--border2); }
+  .agent-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .agent-ident { display: flex; align-items: center; gap: 10px; }
+  .agent-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .a-purple { background: var(--accent-glow); color: var(--accent2); }
+  .a-teal { background: var(--teal-dim); color: var(--teal); }
+  .a-green { background: var(--green-dim); color: var(--green); }
+  .a-pink { background: var(--pink-dim); color: var(--pink); }
+  .agent-name { font-size: 13px; font-weight: 500; color: var(--text1); }
+  .agent-scope { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .status-chip {
+    font-size: 10px; font-weight: 600; padding: 3px 8px;
+    border-radius: 20px; display: flex; align-items: center; gap: 4px;
+  }
+  .chip-active { background: var(--green-dim); color: var(--green); }
+  .chip-idle { background: var(--bg4); color: var(--text3); }
+  .chip-busy { background: var(--amber-dim); color: var(--amber); }
+  .chip-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .agent-stats { display: flex; gap: 16px; margin-bottom: 10px; }
+  .agent-stat-item { display: flex; flex-direction: column; gap: 1px; }
+  .ast-label { font-size: 10px; color: var(--text3); }
+  .ast-val { font-size: 14px; font-weight: 500; color: var(--text1); }
+  .progress-track {
+    height: 3px; background: var(--bg4);
+    border-radius: 4px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, #7c6ef7, #9e93f8);
+    transition: width .4s ease;
+  }
+
+  .log-box {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px;
+    font-family: 'Courier New', monospace; font-size: 12px;
+    max-height: 200px; overflow-y: auto; line-height: 1.8;
+  }
+  .log-box::-webkit-scrollbar { width: 3px; }
+  .log-box::-webkit-scrollbar-thumb { background: var(--bg4); }
+  .log-ts { color: var(--text3); }
+  .log-ok { color: var(--green); }
+  .log-warn { color: var(--amber); }
+  .log-err { color: var(--red); }
+  .log-info { color: var(--accent2); }
+
+  /* ── PROFILES PANEL ── */
+  .profiles-wrap { flex: 1; overflow-y: auto; padding: 24px; }
+  .profiles-wrap::-webkit-scrollbar { width: 4px; }
+  .profiles-wrap::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+  .profile-form {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 20px; max-width: 480px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .form-row { display: flex; flex-direction: column; gap: 5px; }
+  .form-label { font-size: 12px; font-weight: 500; color: var(--text2); }
+  .form-input {
+    padding: 9px 12px; border-radius: var(--radius);
+    border: 1px solid var(--border2); background: var(--bg3);
+    color: var(--text1); font-family: var(--font); font-size: 13px;
+    outline: none; transition: border-color .15s;
+  }
+  .form-input:focus { border-color: rgba(124,110,247,0.5); }
+  .form-select {
+    padding: 9px 12px; border-radius: var(--radius);
+    border: 1px solid var(--border2); background: var(--bg3);
+    color: var(--text1); font-family: var(--font); font-size: 13px;
+    outline: none; cursor: pointer;
+  }
+  .btn-primary {
+    padding: 9px 18px; border-radius: var(--radius);
+    background: linear-gradient(135deg, #7c6ef7, #6b5cf5);
+    border: none; color: #fff; font-family: var(--font);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: opacity .15s; display: flex; align-items: center; gap: 6px;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-ghost {
+    padding: 9px 18px; border-radius: var(--radius);
+    background: transparent; border: 1px solid var(--border2);
+    color: var(--text2); font-family: var(--font);
+    font-size: 13px; cursor: pointer; transition: all .15s;
+  }
+  .btn-ghost:hover { border-color: var(--border); color: var(--text1); background: var(--bg3); }
+  .saved-profiles { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+  .profile-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 10px 14px;
+    transition: border-color .12s;
+  }
+  .profile-row:hover { border-color: var(--border2); }
+  .profile-row-info { flex: 1; }
+  .profile-row-name { font-size: 13px; font-weight: 500; color: var(--text1); }
+  .profile-row-meta { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .profile-row-actions { display: flex; gap: 6px; }
+  .profile-active-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: var(--green-dim); color: var(--green); }
+
+  /* ── HISTORY PANEL ── */
+  .history-wrap { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+  .history-wrap::-webkit-scrollbar { width: 4px; }
+  .history-wrap::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+  .history-toolbar { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .history-entry {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px 16px;
+    display: flex; align-items: flex-start; gap: 12px;
+    transition: border-color .12s;
+  }
+  .history-entry:hover { border-color: var(--border2); }
+  .history-cat-badge {
+    font-size: 10px; font-weight: 600; padding: 3px 8px;
+    border-radius: 20px; white-space: nowrap; flex-shrink: 0; margin-top: 2px;
+  }
+  .history-text { flex: 1; }
+  .history-q { font-size: 13px; color: var(--text1); margin-bottom: 4px; font-weight: 500; }
+  .history-a { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .history-time { font-size: 11px; color: var(--text3); white-space: nowrap; }
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
+  .empty-state i { font-size: 40px; display: block; margin-bottom: 12px; color: var(--text3); }
+  .empty-state p { font-size: 14px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.65);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: var(--radius-xl); padding: 24px;
+    width: 420px; max-width: calc(100vw - 32px);
+    transform: scale(.95); transition: transform .2s;
+  }
+  .modal-overlay.open .modal { transform: scale(1); }
+  .modal-title { font-size: 16px; font-weight: 600; color: var(--text1); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+  .modal-body { display: flex; flex-direction: column; gap: 12px; }
+  .modal-footer { margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end; }
+  .export-opt {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: var(--radius);
+    border: 1px solid var(--border2); cursor: pointer;
+    transition: all .12s; background: var(--bg3);
+  }
+  .export-opt:hover { border-color: rgba(124,110,247,0.4); background: var(--accent-glow); }
+  .export-opt-icon { font-size: 22px; color: var(--accent2); }
+  .export-opt-text strong { font-size: 13px; font-weight: 500; color: var(--text1); display: block; }
+  .export-opt-text span { font-size: 11px; color: var(--text3); }
+
+  /* ── VOICE BANNER ── */
+  .voice-banner {
+    display: none; align-items: center; justify-content: center; gap: 12px;
+    background: var(--teal-dim); border-top: 1px solid rgba(45,212,191,0.2);
+    padding: 10px 20px; font-size: 13px; color: var(--teal);
+    flex-shrink: 0;
+  }
+  .voice-banner.show { display: flex; }
+  .voice-wave { display: flex; gap: 3px; align-items: center; }
+  .wave-bar { width: 3px; border-radius: 3px; background: var(--teal); animation: wave 0.8s infinite ease-in-out; }
+  .wave-bar:nth-child(1) { height: 8px; animation-delay: 0s; }
+  .wave-bar:nth-child(2) { height: 16px; animation-delay: .1s; }
+  .wave-bar:nth-child(3) { height: 12px; animation-delay: .2s; }
+  .wave-bar:nth-child(4) { height: 20px; animation-delay: .3s; }
+  .wave-bar:nth-child(5) { height: 10px; animation-delay: .4s; }
+  @keyframes wave { 0%,100% { transform: scaleY(0.5); } 50% { transform: scaleY(1); } }
+
+  /* ── SCROLLBAR global ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-mark"><i class="ti ti-brain"></i></div>
+    <span class="logo-text">Solv<em>IQ</em></span>
+  </div>
+  <div class="topbar-right">
+    <button class="icon-btn" title="Export history" onclick="openExport()"><i class="ti ti-download"></i></button>
+    <button class="icon-btn" title="Settings"><i class="ti ti-settings"></i></button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Workspace</div>
+      <button class="nav-item active" onclick="switchPanel('chat', this)">
+        <i class="ti ti-message-circle"></i> Problem Solver
+      </button>
+      <button class="nav-item" onclick="switchPanel('history', this)">
+        <i class="ti ti-history"></i> History
+        <span class="nav-badge" id="hist-count">0</span>
+      </button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Monitoring</div>
+      <button class="nav-item" onclick="switchPanel('agents', this)">
+        <i class="ti ti-robot"></i> Agent Dashboard
+      </button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Account</div>
+      <button class="nav-item" onclick="switchPanel('profiles', this)">
+        <i class="ti ti-user-circle"></i> User Profiles
+      </button>
+    </div>
+    <div class="profile-area">
+      <div class="profile-card" onclick="switchPanel('profiles', document.querySelector('[onclick*=profiles]'))">
+        <div class="avatar-circle" id="sidebar-avatar">?</div>
+        <div class="profile-info">
+          <div class="profile-name" id="sidebar-name">No profile</div>
+          <div class="profile-role" id="sidebar-role">Set up profile →</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- CHAT PANEL -->
+    <div class="panel active" id="panel-chat">
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <div class="chat-title" id="chat-title">Life &amp; Decisions</div>
+          <div class="chat-subtitle" id="chat-subtitle">Ask about life choices, relationships, career, or personal goals</div>
+        </div>
+        <div class="chat-header-right">
+          <button class="icon-btn" title="Clear chat" onclick="clearChat()"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>
+
+      <div class="category-bar" role="tablist">
+        <button class="cat-pill active" onclick="selectCat('life', this)" role="tab" aria-selected="true">
+          <i class="ti ti-compass"></i> Life &amp; Decisions
+        </button>
+        <button class="cat-pill" onclick="selectCat('tech', this)" role="tab">
+          <i class="ti ti-code"></i> Tech &amp; Coding
+        </button>
+        <button class="cat-pill" onclick="selectCat('health', this)" role="tab">
+          <i class="ti ti-heart-rate-monitor"></i> Health &amp; Wellness
+        </button>
+        <button class="cat-pill" onclick="selectCat('creative', this)" role="tab">
+          <i class="ti ti-pencil"></i> Creative &amp; Writing
+        </button>
+        <button class="cat-pill" onclick="selectCat('legal', this)" role="tab">
+          <i class="ti ti-scale"></i> Legal &amp; Financial
+        </button>
+        <button class="cat-pill" onclick="selectCat('math', this)" role="tab">
+          <i class="ti ti-calculator"></i> Math &amp; Logic
+        </button>
+      </div>
+
+      <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
+
+      <div class="voice-banner" id="voice-banner">
+        <div class="voice-wave">
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+        Listening… speak your problem now
+        <button class="icon-btn" onclick="stopVoice()" style="color:var(--teal);border-color:var(--teal)"><i class="ti ti-player-stop"></i></button>
+      </div>
+
+      <div class="chat-input-area">
+        <div class="input-box">
+          <textarea id="prompt" placeholder="Describe your problem or ask a question…" rows="1"
+            oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+          <div class="input-actions">
+            <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice input">
+              <i class="ti ti-microphone"></i>
+            </button>
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send">
+              <i class="ti ti-send"></i>
+            </button>
+          </div>
+        </div>
+        <div class="input-hint">Press Enter to send · Shift+Enter for new line · <span id="active-agent-hint" style="color:var(--accent2)">Advisor-1 is ready</span></div>
+      </div>
+    </div>
+
+    <!-- AGENT DASHBOARD -->
+    <div class="panel" id="panel-agents">
+      <div class="dash-scroll">
+        <div class="section-title">Live metrics</div>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Total queries</div>
+            <div class="metric-val" id="m-total">0</div>
+            <div class="metric-sub">This session</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Active agents</div>
+            <div class="metric-val" id="m-active">4</div>
+            <div class="metric-sub">Online now</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Avg response</div>
+            <div class="metric-val" id="m-avg">—</div>
+            <div class="metric-sub">Seconds</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Top category</div>
+            <div class="metric-val" id="m-top" style="font-size:14px">—</div>
+            <div class="metric-sub">By volume</div>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:4px">Agent fleet</div>
+        <div class="agents-grid">
+          <div class="agent-card">
+            <div class="agent-top">
+              <div class="agent-ident">
+                <div class="agent-icon a-purple"><i class="ti ti-brain"></i></div>
+                <div>
+                  <div class="agent-name">Advisor-1</div>
+                  <div class="agent-scope">Life · Legal · Financial</div>
+                </div>
+              </div>
+              <div class="status-chip chip-active" id="a1-chip"><div class="chip-dot"></div>active</div>
+            </div>
+            <div class="agent-stats">
+              <div class="agent-stat-item"><div class="ast-label">Queries</div><div class="ast-val" id="a1-q">0</div></div>
+              <div class="agent-stat-item"><div class="ast-label">Avg (s)</div><div class="ast-val" id="a1-t">—</div></div>
+              <div class="agent-stat-item"><div class="ast-label">Load</div><div class="ast-val" id="a1-load">0%</div></div>
+            </div>
+            <div class="progress-track"><div class="progress-fill" id="a1-p" style="width:0%"></div></div>
+          </div>
+          <div class="agent-card">
+            <div class="agent-top">
+              <div class="agent-ident">
+                <div class="agent-icon a-teal"><i class="ti ti-code"></i></div>
+                <div>
+                  <div class="agent-name">DevBot-2</div>
+                  <div class="agent-scope">Tech · Math · Logic</div>
+                </div>
+              </div>
+              <div class="status-chip chip-active" id="a2-chip"><div class="chip-dot"></div>active</div>
+            </div>
+            <div class="agent-stats">
+              <div class="agent-stat-item"><div class="ast-label">Queries</div><div class="ast-val" id="a2-q">0</div></div>
+              <div class="agent-stat-item"><div class="ast-label">Avg (s)</div><div class="ast-val" id="a2-t">—</div></div>
+              <div class="agent-stat-item"><div class="ast-label">Load</div><div class="ast-val" id="a2-load">0%</div></div>
+            </div>
+            <div class="progress-track"><div class="progress-fill" id="a2-p" style="width:0%"></div></div>
+          </div>
+          <div class="agent-card">
+            <div class="agent-top">
+              <div class="agent-ident">
+                <div class="agent-icon a-green"><i class="ti ti-heart"></i></div>
+                <div>
+                  <div class="agent-name">Wellness-3</div>
+                  <div class="agent-scope">Health · Wellbeing</div>
+                </div>
+              </div>
+              <div class="status-chip chip-idle" id="a3-chip"><div class="chip-dot"></div>idle</div>
+            </div>
+            <div class="agent-stats">
+              <div class="agent-stat-item"><div class="ast-label">Queries</div><div class="ast-val" id="a3-q">0</div></div>
+              <div class="agent-stat-item"><div class="ast-label">Avg (s)</div><div class="ast-val" id="a3-t">—</div></div>
+              <div class="agent-stat-item"><div class="ast-label">Load</div><div class="ast-val" id="a3-load">0%</div></div>
+            </div>
+            <div class="progress-track"><div class="progress-fill" id="a3-p" style="width:0%;background:linear-gradient(90deg,#4ade80,#2dd4bf)"></div></div>
+          </div>
+          <div class="agent-card">
+            <div class="agent-top">
+              <div class="agent-ident">
+                <div class="agent-icon a-pink"><i class="ti ti-pencil"></i></div>
+                <div>
+                  <div class="agent-name">Muse-4</div>
+                  <div class="agent-scope">Creative · Writing</div>
+                </div>
+              </div>
+              <div class="status-chip chip-idle" id="a4-chip"><div class="chip-dot"></div>idle</div>
+            </div>
+            <div class="agent-stats">
+              <div class="agent-stat-item"><div class="ast-label">Queries</div><div class="ast-val" id="a4-q">0</div></div>
+              <div class="agent-stat-item"><div class="ast-label">Avg (s)</div><div class="ast-val" id="a4-t">—</div></div>
+              <div class="agent-stat-item"><div class="ast-label">Load</div><div class="ast-val" id="a4-load">0%</div></div>
+            </div>
+            <div class="progress-track"><div class="progress-fill" id="a4-p" style="width:0%;background:linear-gradient(90deg,#f472b6,#9e93f8)"></div></div>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:4px">Activity log</div>
+        <div class="log-box" id="agent-log">
+          <div><span class="log-ts">[init] </span><span class="log-ok">✓ SolvIQ online — 4 agents ready</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILES PANEL -->
+    <div class="panel" id="panel-profiles">
+      <div class="profiles-wrap">
+        <div class="section-title">Create profile</div>
+        <div class="profile-form">
+          <div class="form-row">
+            <label class="form-label">Display name</label>
+            <input class="form-input" id="pf-name" type="text" placeholder="e.g. Alex" />
+          </div>
+          <div class="form-row">
+            <label class="form-label">Age group</label>
+            <select class="form-select" id="pf-age">
+              <option value="">Select age group</option>
+              <option value="teen">Teen (13–17)</option>
+              <option value="adult">Adult (18–35)</option>
+              <option value="midlife">Midlife (36–59)</option>
+              <option value="senior">Senior (60+)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Preferred tone</label>
+            <select class="form-select" id="pf-tone">
+              <option value="friendly">Friendly &amp; casual</option>
+              <option value="professional">Professional</option>
+              <option value="concise">Brief &amp; concise</option>
+              <option value="detailed">Detailed &amp; thorough</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Default category</label>
+            <select class="form-select" id="pf-cat">
+              <option value="life">Life &amp; Decisions</option>
+              <option value="tech">Tech &amp; Coding</option>
+              <option value="health">Health &amp; Wellness</option>
+              <option value="creative">Creative &amp; Writing</option>
+              <option value="legal">Legal &amp; Financial</option>
+              <option value="math">Math &amp; Logic</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-primary" onclick="saveProfile()"><i class="ti ti-check"></i> Save profile</button>
+            <button class="btn-ghost" onclick="clearProfileForm()">Clear</button>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:24px">Saved profiles</div>
+        <div class="saved-profiles" id="profiles-list">
+          <div class="empty-state"><i class="ti ti-users"></i><p>No profiles yet. Create one above.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY PANEL -->
+    <div class="panel" id="panel-history">
+      <div class="history-wrap">
+        <div class="history-toolbar" style="flex-shrink:0;padding-bottom:4px">
+          <button class="btn-primary" onclick="openExport()"><i class="ti ti-download"></i> Export</button>
+          <button class="btn-ghost" onclick="clearHistory()"><i class="ti ti-trash"></i> Clear all</button>
+        </div>
+        <div id="history-list"></div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- EXPORT MODAL -->
+<div class="modal-overlay" id="export-modal">
+  <div class="modal">
+    <div class="modal-title">
+      Export history
+      <button class="icon-btn" onclick="closeExport()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="export-opt" onclick="exportJSON()">
+        <i class="ti ti-file-code export-opt-icon"></i>
+        <div class="export-opt-text">
+          <strong>JSON</strong>
+          <span>Full structured data — great for AI agents and integrations</span>
+        </div>
+      </div>
+      <div class="export-opt" onclick="exportMarkdown()">
+        <i class="ti ti-markdown export-opt-icon"></i>
+        <div class="export-opt-text">
+          <strong>Markdown</strong>
+          <span>Readable conversation log — copy into Notion, Obsidian, etc.</span>
+        </div>
+      </div>
+      <div class="export-opt" onclick="exportCSV()">
+        <i class="ti ti-table export-opt-icon"></i>
+        <div class="export-opt-text">
+          <strong>CSV</strong>
+          <span>Spreadsheet-ready — open in Excel or Google Sheets</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeExport()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── CONFIG ── */
+const API_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL = 'claude-sonnet-4-6';
+
+const CAT_CFG = {
+  life:     { label: 'Life & Decisions',    agent: 'Advisor-1',  agentIdx: 1, subtitle: 'Ask about life choices, relationships, career, or personal goals', sys: 'You are a thoughtful life coach. Help with personal decisions, relationships, career choices, and life advice. Be warm, empathetic, and practical.' },
+  tech:     { label: 'Tech & Coding',       agent: 'DevBot-2',   agentIdx: 2, subtitle: 'Debug code, explain tech concepts, design systems', sys: 'You are an expert software engineer. Help debug code, explain concepts, design systems. Use code examples when helpful.' },
+  health:   { label: 'Health & Wellness',   agent: 'Wellness-3', agentIdx: 3, subtitle: 'Evidence-based wellness guidance on nutrition, exercise, and mental health', sys: 'You are a wellness advisor. Provide evidence-based health guidance. Always remind users to consult professionals for medical decisions.' },
+  creative: { label: 'Creative & Writing',  agent: 'Muse-4',     agentIdx: 4, subtitle: 'Brainstorm ideas, craft stories, improve writing', sys: 'You are a creative writing expert. Help brainstorm ideas, write content, craft stories, and improve writing. Be inspiring and constructive.' },
+  legal:    { label: 'Legal & Financial',   agent: 'Advisor-1',  agentIdx: 1, subtitle: 'Plain-language legal concepts and financial planning guidance', sys: 'You are a knowledgeable legal and financial guide. Explain concepts in plain language. Always remind users to consult licensed professionals for specific advice.' },
+  math:     { label: 'Math & Logic',        agent: 'DevBot-2',   agentIdx: 2, subtitle: 'Step-by-step problem solving for all skill levels', sys: 'You are a math and logic tutor. Solve problems step by step, explain reasoning clearly, and make complex concepts accessible.' }
+};
+
+const CAT_COLORS = {
+  life: ['#EEEDFE','#534AB7'], tech: ['#E1F5EE','#0F6E56'],
+  health: ['#EAF3DE','#3B6D11'], creative: ['#FBEAF0','#993556'],
+  legal: ['#FAEEDA','#854F0B'], math: ['#E6F1FB','#185FA5']
+};
+
+/* ── STATE ── */
+let currentCat = 'life';
+let chatHistory = [];
+let isLoading = false;
+let historyLog = [];
+let profiles = JSON.parse(localStorage.getItem('solviq_profiles') || '[]');
+let activeProfile = JSON.parse(localStorage.getItem('solviq_active') || 'null');
+let agentStats = { 1:{q:0,total:0}, 2:{q:0,total:0}, 3:{q:0,total:0}, 4:{q:0,total:0} };
+let totalQ = 0, totalTime = 0;
+let catCounts = {};
+let mediaRecognition = null;
+let isRecording = false;
+
+/* ── PANEL SWITCHING ── */
+function switchPanel(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  if (id === 'history') renderHistory();
+  if (id === 'profiles') renderProfiles();
+}
+
+/* ── CATEGORY ── */
+function selectCat(cat, el) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-pill').forEach(p => { p.classList.remove('active'); p.removeAttribute('aria-selected'); });
+  el.classList.add('active'); el.setAttribute('aria-selected', 'true');
+  const cfg = CAT_CFG[cat];
+  document.getElementById('chat-title').textContent = cfg.label;
+  document.getElementById('chat-subtitle').textContent = cfg.subtitle;
+  document.getElementById('active-agent-hint').textContent = cfg.agent + ' is ready';
+  chatHistory = [];
+}
+
+/* ── AUTO RESIZE ── */
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+/* ── MESSAGING ── */
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function addMsg(role, text) {
+  const wrap = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const ts = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const initials = role === 'user' ? (activeProfile ? activeProfile.name.slice(0,2).toUpperCase() : 'U') : 'AI';
+  div.innerHTML = `
+    <div class="msg-avatar">${initials}</div>
+    <div class="msg-content">
+      <div class="msg-meta">${role === 'ai' ? CAT_CFG[currentCat].agent : (activeProfile ? activeProfile.name : 'You')} · ${ts}</div>
+      <div class="msg-bubble">${text.replace(/\n/g,'<br>').replace(/```([\s\S]*?)```/g,'<pre style="background:var(--bg4);padding:10px;border-radius:8px;overflow-x:auto;margin-top:6px;font-size:12px"><code>$1</code></pre>')}</div>
+    </div>`;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function showTyping() {
+  const wrap = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai'; div.id = 'typing-ind';
+  div.innerHTML = `<div class="msg-avatar">AI</div><div class="msg-content"><div class="msg-bubble"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div></div>`;
+  wrap.appendChild(div); wrap.scrollTop = wrap.scrollHeight;
+}
+function removeTyping() { const el = document.getElementById('typing-ind'); if (el) el.remove(); }
+
+async function sendMessage() {
+  if (isLoading) return;
+  const input = document.getElementById('prompt');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = ''; input.style.height = 'auto';
+  isLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  const cat = currentCat;
+  const cfg = CAT_CFG[cat];
+  const aIdx = cfg.agentIdx;
+
+  addMsg('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  showTyping();
+  appendLog(`${cfg.agent} received query [${cfg.label}]`, 'ok');
+  setAgentStatus(aIdx, 'busy');
+
+  let sys = cfg.sys;
+  if (activeProfile) {
+    sys += ` The user is ${activeProfile.name}, age group: ${activeProfile.age}. Use a ${activeProfile.tone} tone.`;
+  }
+
+  const t0 = Date.now();
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: MODEL, max_tokens: 1000, system: sys, messages: chatHistory })
+    });
+    const data = await res.json();
+    const elapsed = parseFloat(((Date.now() - t0) / 1000).toFixed(1));
+    removeTyping();
+
+    if (data.content && data.content[0]) {
+      const reply = data.content[0].text;
+      addMsg('ai', reply);
+      chatHistory.push({ role: 'assistant', content: reply });
+
+      totalQ++; totalTime += elapsed;
+      agentStats[aIdx].q++; agentStats[aIdx].total += elapsed;
+      catCounts[cat] = (catCounts[cat] || 0) + 1;
+
+      historyLog.push({ q: text, a: reply, cat, label: cfg.label, ts: new Date().toISOString(), agent: cfg.agent, elapsed });
+      document.getElementById('hist-count').textContent = historyLog.length;
+
+      updateAgentUI(aIdx, false, elapsed);
+      updateMetrics();
+      appendLog(`${cfg.agent} responded in ${elapsed}s`, 'ok');
+    } else {
+      removeTyping();
+      addMsg('ai', 'Sorry, something went wrong. Please check your API key and try again.');
+      appendLog('Error: ' + JSON.stringify(data.error || 'unknown'), 'err');
+    }
+  } catch (err) {
+    removeTyping();
+    addMsg('ai', 'Network error. Please try again.');
+    appendLog('Network error: ' + err.message, 'err');
+  }
+
+  setAgentStatus(aIdx, 'active');
+  isLoading = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function clearChat() {
+  document.getElementById('chat-messages').innerHTML = '';
+  chatHistory = [];
+  addMsg('ai', 'Chat cleared. What would you like to solve?');
+}
+
+/* ── AGENT UI ── */
+function setAgentStatus(idx, status) {
+  const chip = document.getElementById('a'+idx+'-chip');
+  chip.className = 'status-chip chip-' + status;
+  chip.innerHTML = `<div class="chip-dot"></div>${status}`;
+}
+
+function updateAgentUI(idx, busy, elapsed) {
+  const s = agentStats[idx];
+  document.getElementById('a'+idx+'-q').textContent = s.q;
+  document.getElementById('a'+idx+'-t').textContent = s.q > 0 ? (s.total / s.q).toFixed(1) : '—';
+  const load = Math.min(100, s.q * 10);
+  document.getElementById('a'+idx+'-p').style.width = load + '%';
+  document.getElementById('a'+idx+'-load').textContent = load + '%';
+}
+
+function updateMetrics() {
+  document.getElementById('m-total').textContent = totalQ;
+  document.getElementById('m-avg').textContent = totalQ > 0 ? (totalTime / totalQ).toFixed(1) : '—';
+  const top = Object.entries(catCounts).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('m-top').textContent = top ? CAT_CFG[top[0]].label.split(' ')[0] : '—';
+}
+
+function appendLog(text, type) {
+  const log = document.getElementById('agent-log');
+  const ts = new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  const div = document.createElement('div');
+  div.innerHTML = `<span class="log-ts">[${ts}] </span><span class="log-${type}">${text}</span>`;
+  log.appendChild(div); log.scrollTop = log.scrollHeight;
+}
+
+/* ── PROFILES ── */
+function saveProfile() {
+  const name = document.getElementById('pf-name').value.trim();
+  const age = document.getElementById('pf-age').value;
+  const tone = document.getElementById('pf-tone').value;
+  const cat = document.getElementById('pf-cat').value;
+  if (!name || !age) { alert('Please enter a name and age group.'); return; }
+  const p = { id: Date.now(), name, age, tone, cat, created: new Date().toLocaleDateString() };
+  profiles.push(p);
+  localStorage.setItem('solviq_profiles', JSON.stringify(profiles));
+  activateProfile(p);
+  clearProfileForm();
+  renderProfiles();
+}
+
+function activateProfile(p) {
+  activeProfile = p;
+  localStorage.setItem('solviq_active', JSON.stringify(p));
+  document.getElementById('sidebar-avatar').textContent = p.name.slice(0,2).toUpperCase();
+  document.getElementById('sidebar-name').textContent = p.name;
+  document.getElementById('sidebar-role').textContent = p.age + ' · ' + p.tone;
+  const catEl = document.querySelector(`.cat-pill[onclick*="${p.cat}"]`);
+  if (catEl) { selectCat(p.cat, catEl); }
+}
+
+function deleteProfile(id) {
+  profiles = profiles.filter(p => p.id !== id);
+  localStorage.setItem('solviq_profiles', JSON.stringify(profiles));
+  if (activeProfile && activeProfile.id === id) {
+    activeProfile = null;
+    localStorage.removeItem('solviq_active');
+    document.getElementById('sidebar-avatar').textContent = '?';
+    document.getElementById('sidebar-name').textContent = 'No profile';
+    document.getElementById('sidebar-role').textContent = 'Set up profile →';
+  }
+  renderProfiles();
+}
+
+function clearProfileForm() {
+  document.getElementById('pf-name').value = '';
+  document.getElementById('pf-age').value = '';
+  document.getElementById('pf-tone').value = 'friendly';
+  document.getElementById('pf-cat').value = 'life';
+}
+
+function renderProfiles() {
+  const el = document.getElementById('profiles-list');
+  if (profiles.length === 0) {
+    el.innerHTML = '<div class="empty-state"><i class="ti ti-users"></i><p>No profiles yet. Create one above.</p></div>';
+    return;
+  }
+  el.innerHTML = profiles.map(p => `
+    <div class="profile-row">
+      <div class="avatar-circle" style="width:36px;height:36px;font-size:13px">${p.name.slice(0,2).toUpperCase()}</div>
+      <div class="profile-row-info">
+        <div class="profile-row-name">${p.name}</div>
+        <div class="profile-row-meta">${p.age} · ${p.tone} tone · default: ${CAT_CFG[p.cat].label}</div>
+      </div>
+      ${activeProfile && activeProfile.id === p.id ? '<span class="profile-active-badge">Active</span>' : `<button class="btn-ghost" style="font-size:12px;padding:5px 10px" onclick='activateProfile(${JSON.stringify(p)});renderProfiles()'>Use</button>`}
+      <button class="icon-btn" onclick="deleteProfile(${p.id})" title="Delete"><i class="ti ti-trash"></i></button>
+    </div>`).join('');
+}
+
+/* ── HISTORY ── */
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (historyLog.length === 0) {
+    el.innerHTML = '<div class="empty-state"><i class="ti ti-history"></i><p>No conversations yet. Start solving problems!</p></div>';
+    return;
+  }
+  const [bg, fg] = CAT_COLORS;
+  el.innerHTML = [...historyLog].reverse().map(h => {
+    const [bg, fg] = CAT_COLORS[h.cat] || ['#eee','#333'];
+    return `<div class="history-entry">
+      <span class="history-cat-badge" style="background:${bg};color:${fg}">${h.label}</span>
+      <div class="history-text">
+        <div class="history-q">${h.q.slice(0,120)}${h.q.length > 120 ? '…' : ''}</div>
+        <div class="history-a">${h.a.slice(0,200)}${h.a.length > 200 ? '…' : ''}</div>
+      </div>
+      <div class="history-time">${new Date(h.ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}<br><span style="color:var(--text3)">${h.elapsed}s</span></div>
+    </div>`;
+  }).join('');
+}
+
+function clearHistory() {
+  if (!confirm('Clear all history?')) return;
+  historyLog = [];
+  document.getElementById('hist-count').textContent = '0';
+  renderHistory();
+}
+
+/* ── EXPORT ── */
+function openExport() {
+  document.getElementById('export-modal').classList.add('open');
+}
+function closeExport() {
+  document.getElementById('export-modal').classList.remove('open');
+}
+
+function download(filename, content, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = filename; a.click();
+  closeExport();
+}
+
+function exportJSON() {
+  const data = {
+    exported: new Date().toISOString(),
+    profile: activeProfile,
+    totalQueries: totalQ,
+    history: historyLog
+  };
+  download('solviq-history.json', JSON.stringify(data, null, 2), 'application/json');
+}
+
+function exportMarkdown() {
+  let md = `# SolvIQ History\n_Exported: ${new Date().toLocaleString()}_\n\n`;
+  if (activeProfile) md += `**Profile:** ${activeProfile.name} (${activeProfile.age})\n\n---\n\n`;
+  historyLog.forEach((h, i) => {
+    md += `## ${i+1}. [${h.label}] — ${new Date(h.ts).toLocaleString()}\n\n`;
+    md += `**Q:** ${h.q}\n\n**A (${h.agent}):** ${h.a}\n\n---\n\n`;
+  });
+  download('solviq-history.md', md, 'text/markdown');
+}
+
+function exportCSV() {
+  const rows = [['timestamp','category','agent','question','answer','response_time_s']];
+  historyLog.forEach(h => rows.push([
+    h.ts, h.label, h.agent,
+    `"${h.q.replace(/"/g,'""')}"`,
+    `"${h.a.replace(/"/g,'""')}"`,
+    h.elapsed
+  ]));
+  download('solviq-history.csv', rows.map(r => r.join(',')).join('\n'), 'text/csv');
+}
+
+/* ── VOICE INPUT ── */
+function toggleVoice() {
+  if (isRecording) { stopVoice(); return; }
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Voice input is not supported in this browser. Try Chrome or Edge.');
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  mediaRecognition = new SR();
+  mediaRecognition.continuous = false;
+  mediaRecognition.interimResults = true;
+  mediaRecognition.lang = 'en-US';
+  mediaRecognition.onresult = (e) => {
+    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+    document.getElementById('prompt').value = transcript;
+    autoResize(document.getElementById('prompt'));
+  };
+  mediaRecognition.onend = () => { isRecording = false; setVoiceUI(false); };
+  mediaRecognition.onerror = (e) => { isRecording = false; setVoiceUI(false); appendLog('Voice error: ' + e.error, 'warn'); };
+  mediaRecognition.start();
+  isRecording = true;
+  setVoiceUI(true);
+  appendLog('Voice input started', 'info');
+}
+
+function stopVoice() {
+  if (mediaRecognition) { mediaRecognition.stop(); mediaRecognition = null; }
+  isRecording = false;
+  setVoiceUI(false);
+}
+
+function setVoiceUI(on) {
+  const btn = document.getElementById('voiceBtn');
+  const banner = document.getElementById('voice-banner');
+  btn.className = 'voice-btn' + (on ? ' recording' : '');
+  btn.innerHTML = `<i class="ti ti-microphone${on ? '-off' : ''}"></i>`;
+  banner.className = 'voice-banner' + (on ? ' show' : '');
+}
+
+/* ── INIT ── */
+document.getElementById('export-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('export-modal')) closeExport();
+});
+
+if (activeProfile) activateProfile(activeProfile);
+
+addMsg('ai', `Hello! I'm **SolvIQ** — your real-time problem solver.\n\nPick a category above and describe any problem. I can help with life decisions, coding, health, creative writing, finance, legal questions, and math. What's on your mind?`);
+</script>
+</body>
+</html>
